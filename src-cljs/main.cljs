@@ -1,21 +1,29 @@
-(ns cajax
-  (:require [ajax.core :refer [GET POST] :as a]))
+(ns qrpc.clojurescript-ajax
+  (:import [goog.net Jsonp]))
 
-;; example with jsontest.com
-;;http://ajax.googleapis.com/ajax/services/feed/load?v=1.0&num=10&q=http://feeds.feedburner.com/mathrubhumi
+(def my-url "http://ajax.googleapis.com/ajax/services/feed/load?v=1.0&num=10&q=http://feeds.feedburner.com/bbc")
+
+;; write the HTML
+(.write js/document "Data goes here ---><p>")
+(.write js/document "<div id=\"data\">My Data</div>")
+(def data-element (.getElementById js/document "data"))
+
+
+;; Do the ajax bits
 (defn handler 
   "Handle the ajax response"
   [response]
-    (.log js/console (str response)))
+    ;(set! data-element.innerHTML (str response))
+    (set! data-element.innerHTML (str response.responseData.feed.description))
+    (.log js/console (str "Success:" response)))
 
-(a/ajax-request
-  {:uri "http://ajax.googleapis.com/ajax/services/feed/load"
-    :method :post
-    :params {:v "1.0"
-            :num "10"
-            :q "http://feeds.feedburner.com/mathrubhumi"}
-    :handler handler
-    :format (a/json-request-format)
-    :response-format (a/json-response-format {:keywords? true})})
+(defn err-handler 
+  "Handle the ajax errors"
+  [response]
+    (.log js/console (str "ERROR: " response)))
 
-(.write js/document "Hello from ClojureScript!")
+
+(.send (goog.net.Jsonp. my-url nil)
+  "" handler err-handler nil)
+
+
