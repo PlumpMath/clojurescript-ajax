@@ -13,8 +13,7 @@
   "Handle the ajax response"
   [response]
   (let 
-      [clj-resp (js->clj response {:kewordize-keys true})]
-    ;(set! data-element.innerHTML (str response))
+    [clj-resp (js->clj response {:kewordize-keys true})]
     (set! data-element.innerHTML (str 
         clj-resp 
         ))
@@ -26,7 +25,6 @@
   "Handle the ajax errors"
   [response]
     (.log js/console (str "ERROR: " response)))
-
 
 (.send (goog.net.Jsonp. my-url nil)
   "" handler err-handler nil)
